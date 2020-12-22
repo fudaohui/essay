@@ -23,7 +23,7 @@ public class AnonymousInnerClassTest {
 //        });
 
         /**
-         * 参数2传递实际上看着一个方法，{}里面是函数式接口的唯一方法的调用的内容
+         * 参数2传递实际上看着一个方法，{}里面是函数式接口的唯一方法的调用的内容，即test里面的执行内容
          */
         anonymousInnerClassTest.testAnonymousInnerClass(2,number -> {
             if (number > 1) {
