@@ -1,7 +1,12 @@
 package com.fdh.essay;
 
+import com.fdh.essay.util.SpringContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * https://www.cnblogs.com/yulinfeng/p/12552786.html
@@ -9,8 +14,33 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class EssayApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(EssayApplication.class, args);
-	}
+    @Autowired
+    private ExecutorService executorService;
+
+    public static void main(String[] args) {
+        SpringApplication.run(EssayApplication.class, args);
+        ExecutorService executorService = SpringContextUtils.getBean("aaThreadPool");
+        for (int i = 0; i < 100; i++) {
+            int finalI = i;
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(150);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println(finalI);
+                }
+            });
+        }
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("主进程执行完毕。。。。。。。。。");
+    }
 
 }
