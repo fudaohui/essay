@@ -52,10 +52,15 @@ public class TestProcessor implements InitializingBean, DisposableBean {
             }
         };
         disruptor = new Disruptor<Element>(
+                //事件对象工厂
                 myEventFactory,
+                //buf大小
                 ringBufferSize,
+                //线程工厂
                 threadFactory,
+                //生成者类型
                 ProducerType.MULTI,
+                //阻塞策略
                 new BlockingWaitStrategy());
 
         log.info("init disruptor ringBufferSize : {}", ringBufferSize);
@@ -66,7 +71,7 @@ public class TestProcessor implements InitializingBean, DisposableBean {
 
 
     /**
-     * 发布时间
+     * 发布事件
      *
      * @param v
      */
