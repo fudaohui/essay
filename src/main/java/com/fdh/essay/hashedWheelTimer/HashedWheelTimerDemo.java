@@ -25,30 +25,37 @@ public class HashedWheelTimerDemo {
 
     public static void main(String[] args) {
 //模拟课程开课时间，计算时间差
-//        long off1 = DateUtils.diff(new Date(), DateUtils.offsetMinute(new Date(), 1), DateUnit.SECOND);
-//        long off2 = DateUtils.diff(new Date(), DateUtils.offsetMinute(new Date(), 2), DateUnit.SECOND);
-        log.info("----------开始-----------" );
+        log.info("----------开始-----------");
         List<Long> offs = new ArrayList<>();
-        offs.add(2L);
-        offs.add(5L);
-        CountDownLatch countDownLatch = new CountDownLatch(2);
+        offs.add(10L);
+        offs.add(20L);
+//        CountDownLatch countDownLatch = new CountDownLatch(2);
         HashedWheelTimer timer = new HashedWheelTimer();
         for (int i = 0; i < 2; i++) {
             final int ii = i;
-            timer.newTimeout(new TimerTask() {
+            Timeout timeout = timer.newTimeout(new TimerTask() {
                 @Override
                 public void run(Timeout timeout) throws Exception {
                     log.info("---提醒发送-----" + ii);
-                    countDownLatch.countDown();
+//                    countDownLatch.countDown();
                 }
 
             }, offs.get(i), TimeUnit.SECONDS);
+//            timeout.cancel();
         }
-        try {
-            countDownLatch.await();
-            timer.stop();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            countDownLatch.await();
+//            timer.stop();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
+//        System.out.println(0 & 10);
+//        System.out.println(1 & 10);
+//        System.out.println(9 & 10);
+//        System.out.println(1 & 10);
+//        System.out.println(19 & 10);
+//        System.out.println(20 & 10);
+//        System.out.println(10 & 10);
     }
 }
