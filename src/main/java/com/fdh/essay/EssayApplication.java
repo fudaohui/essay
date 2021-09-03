@@ -1,5 +1,6 @@
 package com.fdh.essay;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,11 +12,12 @@ import java.util.concurrent.ExecutorService;
  * https://www.cnblogs.com/yulinfeng/p/12552786.html
  */
 @EnableAsync
+//@MapperScan("com.fdh.essay.sys.mapper.*mapper*")
 @SpringBootApplication
 public class EssayApplication {
 
-    @Autowired
-    private ExecutorService executorService;
+//    @Autowired
+//    private ExecutorService executorService;
 
     public static void main(String[] args) {
         SpringApplication.run(EssayApplication.class, args);
