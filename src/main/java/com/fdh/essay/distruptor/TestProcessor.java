@@ -24,7 +24,7 @@ public class TestProcessor implements InitializingBean, DisposableBean {
     /**
      * ringBufferSize 大小，必须是 2 的 N 次方；
      */
-    private final static int ringBufferSize = 1024;
+    private final static int ringBufferSize = 2;
 
     @Autowired
     private MyHandler myHandler;
@@ -59,7 +59,7 @@ public class TestProcessor implements InitializingBean, DisposableBean {
                 //线程工厂
                 threadFactory,
                 //生成者类型
-                ProducerType.MULTI,
+                ProducerType.SINGLE,
                 //阻塞策略
                 new BlockingWaitStrategy());
 
