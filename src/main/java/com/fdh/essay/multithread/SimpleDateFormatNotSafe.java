@@ -17,8 +17,9 @@ public class SimpleDateFormatNotSafe {
     /**
      * 线程数为1的时候，和rightContrast一致，大于1，将不一致
      */
-    public static ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(1);
+    public static ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(16);
 
+    private static ThreadLocal threadLocal = ThreadLocal.withInitial(() -> new SimpleDateFormat("mm:ss"));
 //    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16,
 //            0, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
 
@@ -64,9 +65,19 @@ public class SimpleDateFormatNotSafe {
             threadPoolExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    String date = SimpleDateFormatNotSafe.date(finalI, simpleDateFormat);
-                    countDownLatch.countDown();
-                    String put = concurrentHashMap.put(finalI1, date);
+                    //线程不安全的方式
+//                    String date = SimpleDateFormatNotSafe.date(finalI, simpleDateFormat);
+                    //线程安全的方式
+                    try {
+                        SimpleDateFormat simpleDateFormat = (SimpleDateFormat) SimpleDateFormatNotSafe.threadLocal.get();
+                        String date = new SimpleDateFormatNotSafe().date(finalI, simpleDateFormat);
+                        System.out.println(date);
+                        countDownLatch.countDown();
+                        String put = concurrentHashMap.put(finalI1, date);
+                    } finally {
+                        SimpleDateFormatNotSafe.threadLocal.remove();
+                    }
+
                 }
             });
         }
