@@ -1,12 +1,22 @@
 package com.fdh.essay.multithread;
 
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
 /**
  * 线程不安全的SimpleDateFormat演示<br>
+ *
+ * note:多次调用theadlocal的get的值不变，不要随便remove，以免大量频繁创建这个副本
+ *
+ * 使用场景：
+ * 1、多个方法传递userid,不用在每个方法的型参上带了
+ * 2、SimpleDataFormat线程不安全问题？？？
+ * 3、SpringAOP的事务
  *
  * @author: fudaohui
  * @date: 2021-12-10 15:53
@@ -17,11 +27,11 @@ public class SimpleDateFormatNotSafe {
     /**
      * 线程数为1的时候，和rightContrast一致，大于1，将不一致
      */
-    public static ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(16);
+//    public static ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(16);
 
     private static ThreadLocal threadLocal = ThreadLocal.withInitial(() -> new SimpleDateFormat("mm:ss"));
-//    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16,
-//            0, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
+    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(4, 16,
+            200, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000), new NamedThreadFactory("SimpleDateFormatNotSafe"));
 
     public static String str = "mm:ss";
 
@@ -65,16 +75,17 @@ public class SimpleDateFormatNotSafe {
             threadPoolExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    //线程不安全的方式
-//                    String date = SimpleDateFormatNotSafe.date(finalI, simpleDateFormat);
-                    //线程安全的方式
+
                     try {
+                        //线程不安全的方式
+//                        String date = SimpleDateFormatNotSafe.date(finalI, simpleDateFormat);
+                        //线程安全的方式
                         SimpleDateFormat simpleDateFormat = (SimpleDateFormat) SimpleDateFormatNotSafe.threadLocal.get();
                         String date = new SimpleDateFormatNotSafe().date(finalI, simpleDateFormat);
-                        System.out.println(date);
                         countDownLatch.countDown();
-                        String put = concurrentHashMap.put(finalI1, date);
+                        concurrentHashMap.put(finalI1, date);
                     } finally {
+                        //?此处移除后会频繁的在threadLocal创建新的SimpleDateFormat对象
                         SimpleDateFormatNotSafe.threadLocal.remove();
                     }
 
@@ -86,7 +97,7 @@ public class SimpleDateFormatNotSafe {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        threadPoolExecutor.shutdown();
+//        threadPoolExecutor.shutdown();
 
         System.out.println(concurrentHashMap.size() == count);
         Map<Integer, String> integerStringMap = rightContrast(count);
@@ -99,6 +110,15 @@ public class SimpleDateFormatNotSafe {
             }
         }
         System.out.println("unEqualsCount:" + unEqualsCount);
+
+        ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+        // 不需要获取同步的 monitor 和 synchronizer 信息，仅获取线程和线程堆栈信息
+        ThreadInfo[] threadInfos = threadMXBean.dumpAllThreads(false, false);
+        // 遍历线程信息，仅打印线程 ID 和线程名称信
+        for (ThreadInfo threadInfo : threadInfos) {
+            System.out.println("[" + threadInfo.getThreadId() + "] " + threadInfo.getThreadName());
+        }
+        System.out.println(threadPoolExecutor.isShutdown());
 //        Map<Integer, String> integerStringMap = SimpleDateFormatNotSafe.rightContrast(count);
 //        for (String value : integerStringMap.values()) {
 //            System.out.println(value);
