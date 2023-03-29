@@ -1,8 +1,8 @@
 package com.fdh.essay.chainresponsibility;
 
 import com.fdh.essay.chainresponsibility.handler.AvailableLoadBalancerHandler;
-import com.fdh.essay.chainresponsibility.handler.LoadBalancerPipeline;
 import com.fdh.essay.chainresponsibility.handler.RandomLoadBalancerHandler;
+import com.fdh.essay.chainresponsibility.pipeline.LoadBalancerPipeline;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
 public class LBTest {
 
 
-    class DefaultNode implements Node {
+    static class DefaultNode implements Node {
 
         private String id;
         private int weight;
