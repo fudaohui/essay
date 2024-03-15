@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * SpringBootApplication注解包含@HasInherited
  */
 @SpringBootApplication
-public class RunApp extends EssayApplication{
+public class RunApp {
     public static void main(String[] args) {
         SpringApplication.run(RunApp.class);
     }
